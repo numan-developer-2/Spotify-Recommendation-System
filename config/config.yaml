@@ -1,0 +1,103 @@
+# Spotify Recommendation System Configuration
+
+# Paths
+paths:
+  # Raw data
+  raw_data_dir: "data/raw"
+  audio_features_april: "data/raw/SpotifyAudioFeaturesApril2019.csv"
+  audio_features_nov: "data/raw/SpotifyAudioFeaturesNov2018.csv"
+  playlist_challenge: "data/raw/spotify_million_playlist_dataset_challenge/challenge_set.json"
+
+  # Processed data
+  processed_data_dir: "data/processed"
+  audio_features_combined: "data/processed/audio_features.csv"
+  playlists_processed: "data/processed/playlists.csv"
+  interactions: "data/processed/interactions.csv"
+  labels: "data/processed/labels.csv"
+  feature_matrix: "data/processed/feature_matrix.csv"
+
+  # Models
+  models_dir: "models/saved_models"
+  baseline_model: "models/saved_models/baseline_lr.pkl"
+  lightgbm_model: "models/saved_models/lightgbm_model.pkl"
+
+  # Logs
+  logs_dir: "logs"
+
+# Data Processing
+data_processing:
+  # Label generation
+  replay_threshold: 1 # Songs appearing > 1 time = label 1
+  min_playlist_size: 5 # Minimum songs in playlist
+  max_playlist_size: 500 # Maximum songs to consider
+
+  # Train-test split
+  test_size: 0.2
+  random_state: 42
+
+  # Feature engineering
+  normalize_audio_features: true
+  fill_missing_strategy: "median"
+
+# Model Training
+model:
+  # Baseline (Logistic Regression)
+  baseline:
+    solver: "liblinear"
+    max_iter: 1000
+    class_weight: "balanced"
+    random_state: 42
+
+  # LightGBM
+  lightgbm:
+    objective: "binary"
+    metric: "auc"
+    boosting_type: "gbdt"
+    num_leaves: 31
+    learning_rate: 0.05
+    n_estimators: 200
+    max_depth: 7
+    min_child_samples: 20
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+    verbose: -1
+
+  # XGBoost (alternative)
+  xgboost:
+    objective: "binary:logistic"
+    eval_metric: "auc"
+    max_depth: 7
+    learning_rate: 0.05
+    n_estimators: 200
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+
+# Recommendation
+recommendation:
+  top_k: 10 # Number of recommendations to return
+  candidate_pool_size: 1000 # Candidate songs to score
+  diversity_weight: 0.3 # Balance between relevance and diversity
+  min_popularity: 10 # Minimum song popularity to recommend
+
+# API
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+  workers: 1
+
+# Evaluation Metrics
+evaluation:
+  metrics:
+    - "roc_auc"
+    - "precision"
+    - "recall"
+    - "f1"
+  precision_k: [5, 10, 20] # Precision@K values
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
